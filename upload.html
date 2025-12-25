@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>NeckTube Upload</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { background:#181818; color:white; font-family:Arial; padding:20px; }
+    input, button { padding:10px; margin:10px 0; width:100%; font-size:16px; }
+    button { background:#ff3d3d; border:none; color:white; cursor:pointer; }
+  </style>
+</head>
+<body>
+
+  <h2>Video Yükle</h2>
+
+  <input id="title" placeholder="Video başlığı yaz" />
+  <input type="file" id="file" accept="video/*" />
+
+  <button onclick="upload()">YÜKLE 🔥</button>
+
+  <p id="status"></p>
+
+  <script>
+    // ---- BURAYI DEĞİŞTİR ----
+    const SUPABASE_URL = "BURAYA PROJECT URL";
+    const SUPABASE_KEY = "BURAYA API KEY";
+    // --------------------------
+
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function upload() {
+      const file = document.getElementById("file").files[0];
+      const title = document.getElementById("title").value;
+
+      if (!file) {
+        alert("Video seçmedin kanka!");
+        return;
+      }
+
+      let fileName = Date.now() + "-" + file.name;
+
+      document.getElementById("status").innerText = "Yükleniyor...";
+
+      // 1 — STORAGE'A YÜKLE
+      const { data, error } = await supabase
+        .storage
+        .from("videos")
+        .upload(fileName, file);
+
+      if (error) {
+        alert("HATA: " + error.message);
+        return;
+      }
+
+      // 2 — PUBLIC URL AL
+      const { data: urlData } = supabase
+        .storage
+        .from("videos")
+        .getPublicUrl(fileName);
+
+      const videoURL = urlData.publicUrl;
+
+      // 3 — DATABASE'E KAYDET
+      await supabase.from("videos").insert({
+        title: title,
+        filename: fileName,
+        url: videoURL
+      });
+
+      document.getElementById("status").innerText =
+        "YÜKLENDİ! 🎉 Video URL: " + videoURL;
+    }
+  </script>
+
+</body>
+</html>
