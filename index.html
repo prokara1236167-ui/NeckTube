@@ -1,138 +1,183 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
   <meta charset="UTF-8" />
   <title>NeckTube</title>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: Arial;
       background: #181818;
       color: white;
-      display: flex;
     }
 
-    /* ---------- SİDEBAR ---------- */
-    .sidebar {
-      width: 70px;
-      background: #202020;
-      height: 100vh;
-      padding-top: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-      align-items: center;
-      position: fixed;
-    }
-
-    .sidebar div {
-      font-size: 12px;
-      text-align: center;
-      color: #ccc;
-      cursor: pointer;
-    }
-
-    .sidebar div:hover {
-      color: white;
-    }
-
-    /* ---------- HEADER ---------- */
     .header {
       background: #202020;
-      padding: 12px;
+      padding: 15px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      margin-left: 70px;
-      position: fixed;
-      top: 0;
-      z-index: 10;
     }
 
     .logo {
-      font-size: 24px;
+      font-size: 26px;
       font-weight: bold;
       color: #ff3d3d;
     }
 
-    .search-box {
-      display: flex;
-      width: 40%;
-    }
-
-    .search-input {
-      flex: 1;
-      padding: 8px;
-      border-radius: 4px 0 0 4px;
+    .upload-button {
+      margin-left: auto;
+      padding: 10px 16px;
+      background: #ff3d3d;
       border: none;
-      font-size: 15px;
-    }
-
-    .search-btn {
-      padding: 8px 15px;
-      background: #303030;
-      border: none;
-      border-radius: 0 4px 4px 0;
+      border-radius: 6px;
       color: white;
+      font-weight: bold;
       cursor: pointer;
+      transition: 0.2s;
     }
 
-    /* ---------- CONTENT ---------- */
+    .upload-button:hover {
+      background: #ff5e5e;
+    }
+
     .content {
-      padding: 90px 20px 20px 90px;
+      padding: 20px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 20px;
-      width: 100%;
     }
 
     .video-card {
       background: #282828;
+      padding: 10px;
       border-radius: 8px;
-      padding-bottom: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .video-card:hover {
+      background: #303030;
     }
 
     .video-card img {
       width: 100%;
-      border-radius: 8px 8px 0 0;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
     }
 
-    .title {
-      padding: 8px 10px;
+    .video-title {
+      margin-top: 8px;
       font-size: 15px;
+      font-weight: bold;
     }
   </style>
 </head>
+
 <body>
 
-  <!-- ---- LEFT MENU ---- -->
-  <div class="sidebar">
-    <div>🏠<br>Home</div>
-    <div>🎬<br>Shorts</div>
-    <div>⭐<br>Subs</div>
-  </div>
-
-  <!-- ---- HEADER ---- -->
   <div class="header">
     <div class="logo">NeckTube</div>
 
-    <div class="search-box">
-      <input class="search-input" placeholder="Ara..." />
-      <button class="search-btn">🔍</button>
-    </div>
+    <button id="uploadBtn" class="upload-button">Video Yükle</button>
   </div>
 
-  <!-- ---- VIDEO GRID ---- -->
-  <div class="content">
+  <div class="content" id="videoList"></div>
 
-    <!-- Örnek video kartı -->
-    <div class="video-card">
-      <img src="https://i.ytimg.com/vi/0I647GU3Jsc/maxresdefault.jpg" />
-      <div class="title">Örnek Video</div>
-    </div>
+  <!-- Görünmez input -->
+  <input type="file" id="videoInput" accept="video/*" style="display:none;">
 
-  </div>
+
+  <script type="module">
+
+    // --------------------------------------------------
+    //  CONFIG — BURAYI DOLDURUYORSUN
+    // --------------------------------------------------
+    const supabaseUrl =https://kumxqmlqyolrordfykxi.supabase.co
+    const supabaseKey =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1bXhxbWxxeW9scm9yZGZ5a3hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY1ODU2OTMsImV4cCI6MjA4MjE2MTY5M30.DDxi3gU7QgC0g9caG0QePuGicvovoCTXVf4xwfObVGI
+    const db = supabase.createClient(supabaseUrl, supabaseKey);
+
+
+    // --------------------------------------------------
+    //  VIDEOLARI SUPABASE'DEN ÇEK VE SAYFAYA BAS
+    // --------------------------------------------------
+    async function loadVideos() {
+      const { data, error } = await db.from("videos").select("*").order("id", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      const container = document.getElementById("videoList");
+      container.innerHTML = "";
+
+      data.forEach(v => {
+        container.innerHTML += `
+          <div class="video-card" onclick="window.open('${v.url}', '_blank')">
+            <img src="${v.thumbnail || 'https://i.ytimg.com/vi/0I647GU3Jsc/maxresdefault.jpg'}">
+            <div class="video-title">${v.title}</div>
+          </div>
+        `;
+      });
+    }
+
+    loadVideos();
+
+
+    // --------------------------------------------------
+    //  VIDEO YÜKLEME TUŞU
+    // --------------------------------------------------
+    document.getElementById("uploadBtn").onclick = () => {
+      document.getElementById("videoInput").click();
+    };
+
+
+    // --------------------------------------------------
+    //  VIDEO SEÇİLDİĞİNDE ÇALIŞIR
+    // --------------------------------------------------
+    document.getElementById("videoInput").onchange = async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const fileName = Date.now() + "_" + file.name;
+
+      // Storage'a yükle
+      const { data: uploadData, error: uploadError } = await db
+        .storage
+        .from("videos")
+        .upload(fileName, file);
+
+      if (uploadError) {
+        alert("HATA: Video yüklenemedi!");
+        console.error(uploadError);
+        return;
+      }
+
+      // Videonun public URL'si
+      const videoUrl = `${supabaseUrl}/storage/v1/object/public/videos/${fileName}`;
+
+      // Database'e ekle
+      await db.from("videos").insert([
+        {
+          title: file.name,
+          url: videoUrl,
+          thumbnail: "https://i.ytimg.com/vi/0I647GU3Jsc/maxresdefault.jpg"
+        }
+      ]);
+
+      alert("Video yüklendi!");
+
+      loadVideos(); // Yenile
+    };
+
+  </script>
 
 </body>
+
 </html>
