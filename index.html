@@ -4,25 +4,134 @@
   <meta charset="UTF-8" />
   <title>NeckTube</title>
   <style>
-    body { margin: 0; font-family: Arial; background: #181818; color: white; }
-    .header { background: #202020; padding: 15px; display: flex; align-items: center; }
-    .logo { font-size: 26px; font-weight: bold; color: #ff3d3d; }
-    .content { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-    .video-card { background: #282828; padding: 10px; border-radius: 8px; }
-    .video-card img { width: 100%; border-radius: 8px; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #181818;
+      color: white;
+      display: flex;
+    }
+
+    /* ---------- SİDEBAR ---------- */
+    .sidebar {
+      width: 70px;
+      background: #202020;
+      height: 100vh;
+      padding-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      align-items: center;
+      position: fixed;
+    }
+
+    .sidebar div {
+      font-size: 12px;
+      text-align: center;
+      color: #ccc;
+      cursor: pointer;
+    }
+
+    .sidebar div:hover {
+      color: white;
+    }
+
+    /* ---------- HEADER ---------- */
+    .header {
+      background: #202020;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      margin-left: 70px;
+      position: fixed;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ff3d3d;
+    }
+
+    .search-box {
+      display: flex;
+      width: 40%;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 4px 0 0 4px;
+      border: none;
+      font-size: 15px;
+    }
+
+    .search-btn {
+      padding: 8px 15px;
+      background: #303030;
+      border: none;
+      border-radius: 0 4px 4px 0;
+      color: white;
+      cursor: pointer;
+    }
+
+    /* ---------- CONTENT ---------- */
+    .content {
+      padding: 90px 20px 20px 90px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      width: 100%;
+    }
+
+    .video-card {
+      background: #282828;
+      border-radius: 8px;
+      padding-bottom: 10px;
+    }
+
+    .video-card img {
+      width: 100%;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .title {
+      padding: 8px 10px;
+      font-size: 15px;
+    }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <div class="logo">NeckTube</div>
+  <!-- ---- LEFT MENU ---- -->
+  <div class="sidebar">
+    <div>🏠<br>Home</div>
+    <div>🎬<br>Shorts</div>
+    <div>⭐<br>Subs</div>
   </div>
 
+  <!-- ---- HEADER ---- -->
+  <div class="header">
+    <div class="logo">NeckTube</div>
+
+    <div class="search-box">
+      <input class="search-input" placeholder="Ara..." />
+      <button class="search-btn">🔍</button>
+    </div>
+  </div>
+
+  <!-- ---- VIDEO GRID ---- -->
   <div class="content">
+
+    <!-- Örnek video kartı -->
     <div class="video-card">
       <img src="https://i.ytimg.com/vi/0I647GU3Jsc/maxresdefault.jpg" />
-      <p>Örnek Video Başlığı</p>
+      <div class="title">Örnek Video</div>
     </div>
+
   </div>
 
 </body>
